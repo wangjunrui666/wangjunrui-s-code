@@ -23,16 +23,16 @@ inline void read(T&x)
 	return;
 }
 int n;
-double f[1000010],g[1000010];
+double f[1000010],dp[1000010];
 int main()
 {
 	read(n);
-	for(re int i=n-1; ~i; i--)
+	for(re int i=n-1; i>=0; i--)
 	{
-		f[i]=f[i+1]+(double)n/(double)(n-i);
-		g[i]=(double)i/(n-i)*(f[i]+1)+g[i+1]+f[i+1]+1;
+		f[i]=+(double)n/(n-i)+f[i+1];
+		dp[i]=(double)i*(f[i]+1)/(n-i)+f[i+1]+dp[i+1];
 	}
-	printf("%.2lf\n",g[0]);
+	printf("%.2lf\n",dp[0]);
 	return 0;
 }
 

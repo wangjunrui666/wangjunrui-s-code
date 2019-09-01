@@ -1,92 +1,65 @@
 #include<cstdio>
 #include<cstring>
 #include<queue>
+#define re register
 using namespace std;
-
-const int MAXB = 25, MAXP = 105, inf = 0x3f3f3f3f;
-
-struct Heapnode
+char before[1010][1010],now[1010][1010];
+int g[1000010],dis[(1<<28)+100],n,m,kase;
+bool exist[(1<<28)+100];
+queue<int>q;
+int main()
 {
-	int bug, dist;
-	Heapnode() {}
-	Heapnode(int bug, int dist)
+	while(scanf("%d%d",&n,&m),n)
 	{
-		this->bug = bug;
-		this->dist = dist;
-	}
-	bool operator < (const Heapnode &rhs) const
-	{
-		return dist > rhs.dist;
-	}
-};
-
-char before[MAXP][MAXB], after[MAXP][MAXB];
-int t[MAXP], d[1 << MAXB], vis[1 << MAXB],sum;
-int n, m;
-
-inline int Dijkstra()
-{
-	for(int i = 0; i < (1 << n); i++)
-		d[i] = inf, vis[i] = 0;
-
-	priority_queue<Heapnode> Q;
-	Q.push(Heapnode((1 << n) - 1, 0));
-	d[(1 << n) - 1] = 0;
-
-	while(!Q.empty())
-	{
-		Heapnode tmp = Q.top();
-		Q.pop();
-		//printf("%d\n",tmp.bug);
-		if(tmp.bug == 0) return tmp.dist;
-		if(vis[tmp.bug]) continue;
-		vis[tmp.bug] = 1;
-
-		for(int i = 0; i < m; i++)
+		for(re int i=1; i<=m; i++)
+			scanf("%d%s%s",&g[i],before[i],now[i]);
+		fill(dis,dis+(1<<n),0x3f3f3f3f);
+		dis[(1<<n)-1]=0;
+		q.push((1<<n)-1);
+		while(!q.empty())
 		{
-			int ok = 1;
-			for(int j = 0; j < n; j++)
+			int u=q.front();
+			q.pop();
+			exist[u]=false;
+			for(re int i=1; i<=m; i++)
 			{
-				if(before[i][j] == '-' && ((1 << j) & tmp.bug)) ok = 0;
-				if(before[i][j] == '+' && !((1 << j) & tmp.bug)) ok = 0;
-			}
-			if(ok)
-			{
-				sum++;
-				int bug = tmp.bug;
-				for(int j = 0; j < n; j++)
-					if(after[i][j] == '-') bug &= ~(1 << j);
-					else if(after[i][j] == '+') bug |= 1 << j;
-				//printf("%d\n",bug);
-				//printf("%d %d\n",tmp.bug,bug);
-				if(d[bug] > tmp.dist + t[i])
+				//printf("%d\n",u);
+				bool flag=true;
+				for(re int j=0; j<n; j++)
 				{
-					d[bug] = tmp.dist + t[i];
-					//printf("%d\n",bug);
-					Q.push(Heapnode(bug, d[bug]));
+					if(before[i][j]=='-'&&((1<<j)&u))
+						flag=false;
+					if(before[i][j]=='+'&&!((1<<j)&u))
+						flag=false;
+				}
+				//printf("%d %d %d\n",u,i,flag);
+				if(flag)
+				{
+					int v=u;
+					for(re int j=0; j<n; j++)
+						if(now[i][j]=='-')
+							v&=~(1<<j);
+						else if(now[i][j]=='+')
+							v|=(1<<j);
+					if(dis[v]>dis[u]+g[i])
+					{
+						dis[v]=dis[u]+g[i];
+						if(!exist[v])
+						{
+							exist[v]=true;
+							q.push(v);
+						}
+					}
 				}
 			}
 		}
-	}/*
-	for(int i=0; i<=(1<<n)-1; i++)
-		printf("%d ",d[i]);
-	putchar('\n');*/
-	//printf("%d\n",sum);
-	return -1;
-}
-
-int main()
-{
-	int T = 0;
-	while(scanf("%d %d", &n, &m) == 2 && n)
-	{
-		for(int i = 0; i < m; i++)
-			scanf("%d%s%s", &t[i], before[i], after[i]);
-
-		int ans  = Dijkstra();
-		printf("Product %d\n", ++T);
-		if(ans < 0) printf("Bugs cannot be fixed.\n\n");
-		else printf("Fastest sequence takes %d seconds.\n\n", ans);
+		printf("Product %d\n",++kase);
+		if(dis[0]==0x3f3f3f3f)
+			printf("Bugs cannot be fixed.\n");
+		else
+			printf("Fastest sequence takes %d seconds.\n",dis[0]);
+		putchar('\n');
 	}
 	return 0;
 }
+
