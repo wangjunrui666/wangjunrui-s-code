@@ -1,27 +1,67 @@
 #include<cstdio>
 #include<cstring>
+#include<cctype>
 #define re register
 using namespace std;
-template<typename T>
-inline void read(T&x)
+namespace IO
 {
-	x=0;
-	char s=getchar();
-	bool f=false;
-	while(!(s>='0'&&s<='9'))
+	const int SIZE=1<<30;
+	char ibuf[SIZE],*iS,*iT;
+#define gc() (iS==iT?(iT=(iS=ibuf)+fread(ibuf,1,SIZE,stdin),iS==iT?EOF:*iS++):*iS++)
+	template<typename T>
+	inline void read(T & x)
 	{
-		if(s=='-')
-			f=true;
-		s=getchar();
+		x=0;
+		bool b=false;
+		char ch=gc();
+		while(!isdigit(ch)&&ch^'-')
+			ch=gc();
+		if(ch=='-')
+		{
+			b=true;
+			ch=gc();
+		}
+		while(isdigit(ch))
+		{
+			x=(x<<1)+(x<<3)+(ch^'0');
+			ch=gc();
+		}
+		if(b)
+			x=~x+1;
+		return;
 	}
-	while(s>='0'&&s<='9')
+#undef gc
+	char Out[1<<25],*fe=Out,ch[25];
+	int num=0;
+	template<typename T>
+	inline void write(T x)
 	{
-		x=(x<<1)+(x<<3)+s-'0';
-		s=getchar();
+		if(!x)
+			*fe++='0';
+		if(x<0)
+		{
+			*fe++='-';
+			x=-x;
+		}
+		while(x)
+		{
+			ch[++num]=x%10+'0';
+			x/=10;
+		}
+		while(num)
+			*fe++=ch[num--];
 	}
-	if(f)
-		x=(~x)+1;
+	inline void write_char(char s)
+	{
+		*fe++=s;
+	}
+	inline void flush()
+	{
+		fwrite(Out,1,fe-Out,stdout);
+		fe=Out;
+	}
 }
+using namespace IO;
 #define solve(x,len) (x<len?x:0)
 const int LEN=1e6+10;
 int a[LEN],b[LEN],p[LEN],t[LEN],s[LEN],n,m,last[LEN],T,C,ans[LEN],top;
@@ -51,10 +91,14 @@ inline void kmp()
 			j=p[j];
 		}
 	}
-	printf("%d\n",top);
+	write(top);
+	write_char('\n');
 	for(re int i=1; i<=top; i++)
-		printf("%d ",ans[i]);
-	putchar('\n');
+	{
+		write(ans[i]);
+		write_char(' ');
+	}
+	write_char('\n');
 	top=0;
 }
 int main()
@@ -87,5 +131,6 @@ int main()
 			printf("%d ",p[i]);
 		putchar('\n');*/
 	}
+	flush();
 	return 0;
 }
