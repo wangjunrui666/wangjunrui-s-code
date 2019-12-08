@@ -1,5 +1,5 @@
 #include<cstdio>
-#include<cstring>
+#include<algorithm>
 #define re register
 using namespace std;
 template<typename T>
@@ -22,7 +22,7 @@ inline void read(T&x)
 	if(f)
 		x=(~x)+1;
 }
-int n,q,a[1000010],conut,p;
+int n,q,a[1000010],conut,p,x;
 int main()
 {
 	while(read(n),read(q),n&&q)
@@ -33,13 +33,13 @@ int main()
 		sort(a+1,a+1+n);
 		while(q--)
 		{
-			p=lower_bound(a+1,a+1+n)-a-1;
+			read(x);
+			p=lower_bound(a+1,a+1+n,x)-a;
 			if(a[p]==x)
-				printf("%d found at %d",x,p);
+				printf("%d found at %d\n",x,p);
 			else
-				printf("%d not found",x);
+				printf("%d not found\n",x);
 		}
 	}
 	return 0;
 }
-
