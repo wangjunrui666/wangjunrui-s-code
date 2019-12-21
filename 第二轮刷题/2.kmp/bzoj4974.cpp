@@ -43,7 +43,7 @@ int main()
 				vis[str[j+1]-'a']=true;
 //			for(re int j=0; j<=26; ++j)
 //				printf("%d ",vis[j]);
-			for(re int j=0; j<=26; ++j)
+			for(re int j=0; j<26; ++j)
 				if(!vis[j])
 				{
 					str[i]=j+'a';
