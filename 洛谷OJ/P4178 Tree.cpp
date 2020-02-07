@@ -1,102 +1,96 @@
 #include<cstdio>
-#include<cstring>
+#include<vector>
 #include<algorithm>
 #define re register
-#define ll long long
-#define ull unsigned ll
 using namespace std;
-template<typename T>
-inline void read(T&x)
+
+template <typename T>
+inline void read(T &x)
 {
 	x=0;
 	char s=(char)getchar();
-	bool f=false;
-	while(!(s>='0'&&s<='9'))
+	bool flag=false;
+	while(s<'0'||s>'9')
 	{
 		if(s=='-')
-			f=true;
+			flag=true;
 		s=(char)getchar();
 	}
 	while(s>='0'&&s<='9')
 	{
-		x=(x<<1)+(x<<3)+s-'0';
+		x=(x<<1)+(x<<3)+(s^'0');
 		s=(char)getchar();
 	}
-	if(f)
-		x=(~x)+1;
+	if(flag)
+		x=~x+1;
+	return;
 }
+
 const int N=4e4+5;
-int head[N],num_edge;
 struct Edge
 {
 	int next,to,dis;
+	Edge() {}
+	Edge(int n,int t,int d):next(n),to(t),dis(d) {}
 } edge[N<<1];
+int head[N],num_edge;
 inline void add_edge(int from,int to,int dis)
 {
-	edge[++num_edge].next=head[from];
-	edge[num_edge].to=to;
-	edge[num_edge].dis=dis;
+	edge[++num_edge]=Edge(head[from],to,dis);
 	head[from]=num_edge;
 }
-#define size sze
-int n,k,dis[N],f[N],size[N],root,deep[N],sum;
+int size[N],maxn[N],sum,root;
 bool vis[N];
 inline void getroot(int u,int fa)
 {
 	size[u]=1;
-	f[u]=0;
+	maxn[u]=0;
 	for(re int i=head[u]; i; i=edge[i].next)
 	{
 		int &v=edge[i].to;
-		if(vis[v]||fa==v)
+		if(vis[v]||v==fa)
 			continue;
 		getroot(v,u);
 		size[u]+=size[v];
-		f[u]=max(f[u],size[v]);
+		maxn[u]=max(maxn[u],size[v]);
 	}
-	f[u]=max(f[u],sum-size[u]);
-	if(f[u]<f[root])
+	maxn[u]=max(maxn[u],sum-size[u]);
+	if(maxn[root]>maxn[u])
 		root=u;
 }
-inline void getdeep(int u,int fa)
+int dis[N];
+vector<int>deep;
+inline void getdis(int u,int fa)
 {
-	deep[++deep[0]]=dis[u];
+	deep.push_back(dis[u]);
 	for(re int i=head[u]; i; i=edge[i].next)
 	{
 		int &v=edge[i].to,&w=edge[i].dis;
-		if(vis[v]||fa==v)
+		if(vis[v]||v==fa)
 			continue;
 		dis[v]=dis[u]+w;
-		getdeep(v,u);
+		getdis(v,u);
 	}
 }
-inline ll calc(int u,int val)
+int n,k,ans;
+inline int calc(int u,int w)
 {
-	dis[u]=val;
-	deep[0]=0;
-	getdeep(u,0);
-//	for(re int i=1; i<=deep[0]; ++i)
-//		printf("%d ",deep[i]);
-//	putchar('\n');
-	stable_sort(deep+1,deep+1+deep[0]);
-	ll res=0;
-	int l=1,r=deep[0];
+	dis[u]=w;
+	deep.clear();
+	getdis(u,0);
+	stable_sort(deep.begin(),deep.end());
+	int res=0,l=0,r=(int)deep.size()-1;
 	while(l<r)
 	{
 		if(deep[l]+deep[r]<=k)
-		{
-			res+=r-l;
-			++l;
-		}
+			res+=r-l++;
 		else
 			--r;
 	}
 	return res;
 }
-ll ans;
 inline void solve(int u)
 {
-//	printf("%d\n",u);
 	ans+=calc(u,0);
 	vis[u]=true;
 	for(re int i=head[u]; i; i=edge[i].next)
@@ -105,48 +99,27 @@ inline void solve(int u)
 		if(vis[v])
 			continue;
 		ans-=calc(v,w);
-		sum=size[v];
-		root=0;
-		getroot(v,0);
+		maxn[root=0]=sum=size[v];
+		getroot(v,u);
+		getroot(root,u);
 		solve(root);
 	}
 }
-inline void clear_all()
-{
-	root=num_edge=0;
-	ans=0ll;
-	fill(head+1,head+1+n,0);
-	fill(vis+1,vis+1+n,false);
-}
 int main()
 {
-//	while(scanf("%d%d",&n,&k)!=EOF&&(n||k))
-//	{
 	read(n);
-//	if(n==40000)
-//	{
-//		printf("799980000\n");
-//		return 0;
-//	}
-//	clear_all();
 	for(re int i=1; i<n; ++i)
 	{
 		int u,v,w;
-		read(u);
-		read(v);
-		read(w);
+		read(u),read(v),read(w);
 		add_edge(u,v,w);
 		add_edge(v,u,w);
 	}
 	read(k);
-	sum=n;
-	root=0;
-	f[0]=0x7fffffff;
+	maxn[ans=root=0]=sum=n;
 	getroot(1,0);
-//	for(re int i=1; i<=n; ++i)
-//		printf("%d ",f[i]);
+	getroot(root,0);
 	solve(root);
-	printf("%lld\n",ans);
-//	}
+	printf("%d\n",ans);
+	return 0;
 }
-#undef size

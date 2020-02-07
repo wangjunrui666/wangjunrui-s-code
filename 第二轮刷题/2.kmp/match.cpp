@@ -24,7 +24,7 @@ inline void read(T&x)
 		x=(~x)+1;
 }
 const int N=500005,S=10005;
-int p1[N],p2[N],p3[N],nxt[N],pre[S],n,m,s,str[N],a[N],ans[N];
+int idx1[N],idx2[N],idx3[N],nxt[N],pre[S],n,m,s,str[N],a[N],ans[N];
 stack<int>st[S];
 int main()
 {
@@ -36,7 +36,7 @@ int main()
 		read(a[i]);
 	for(re int i=0; i<m; ++i)
 	{
-		p1[i]=st[a[i]].empty()?-1:i-st[a[i]].top();
+		idx1[i]=st[a[i]].empty()?-1:i-st[a[i]].top();
 		st[a[i]].push((int)i);
 	}
 	for(re int i=1,now=-1; i<=s; ++i)
@@ -50,8 +50,8 @@ int main()
 		}
 	for(re int i=m-1; i>=0; --i)
 	{
-		p2[i]=pre[a[i]]==-1?-1:i-st[pre[a[i]]].top();
-		p3[i]=nxt[a[i]]==-1?-1:i-st[nxt[a[i]]].top();
+		idx2[i]=pre[a[i]]==-1?-1:i-st[pre[a[i]]].top();
+		idx3[i]=nxt[a[i]]==-1?-1:i-st[nxt[a[i]]].top();
 		st[a[i]].pop();
 		if(st[a[i]].empty())
 		{
@@ -63,12 +63,12 @@ int main()
 	}
 	memset(nxt,0,sizeof(nxt));
 //	for(re int i=0; i<=m-1; ++i)
-//		printf("%d %d %d\n",p1[i],p2[i],p3[i]);
+//		printf("%d %d %d\n",idx1[i],idx2[i],idx3[i]);
 	nxt[0]=-1;
 	
 	for(re int i=0,j=-1;i<m;)
 	{
-		if(j==-1||((p1[j]==-1||a[i-p1[j]]==a[i])&&(p2[j]==-1||a[i-p2[j]]<a[i])&&(p3[j]==-1||a[i-p3[j]]>a[i])))
+		if(j==-1||((idx1[j]==-1||a[i-idx1[j]]==a[i])&&(idx2[j]==-1||a[i-idx2[j]]<a[i])&&(idx3[j]==-1||a[i-idx3[j]]>a[i])))
 			nxt[++i]=++j;
 		else
 			j=nxt[j];
@@ -78,7 +78,7 @@ int main()
 //	printf("\n");
 	for(re int i=0,j=0;i<n;)
 	{
-		if(j==-1||((p1[j]==-1||str[i-p1[j]]==str[i])&&(p2[j]==-1||str[i-p2[j]]<str[i])&&(p3[j]==-1||str[i-p3[j]]>str[i])))
+		if(j==-1||((idx1[j]==-1||str[i-idx1[j]]==str[i])&&(idx2[j]==-1||str[i-idx2[j]]<str[i])&&(idx3[j]==-1||str[i-idx3[j]]>str[i])))
 		{
 			++i;
 			++j;

@@ -40,3 +40,4 @@ int main()
 			printf("Yes\n");
 	}
 }
+

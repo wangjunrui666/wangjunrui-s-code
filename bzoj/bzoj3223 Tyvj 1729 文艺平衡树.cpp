@@ -1,5 +1,6 @@
 #include<cstdio>
-#include<random>
+#include<cstdlib>
+#include<algorithm>
 #include<ctime>
 #define re register
 using namespace std;
@@ -26,7 +27,6 @@ inline void read(T&x)
 }
 
 const int N=1e5+5;
-mt19937 rnd((unsigned int)time(0));
 class fhq_treap
 {
 	private:
@@ -40,7 +40,7 @@ class fhq_treap
 		inline int newnode(int val)
 		{
 			tree[++cnt].val=val;
-			tree[cnt].key=rnd();
+			tree[cnt].key=rand();
 			tree[cnt].size=1;
 			return cnt;
 		}
@@ -143,6 +143,7 @@ class fhq_treap
 
 int main()
 {
+	srand((unsigned int)time(0));
 	fhq.work();
 	return 0;
 }
