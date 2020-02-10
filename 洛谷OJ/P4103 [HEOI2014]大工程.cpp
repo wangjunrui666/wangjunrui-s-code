@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstdio>
 #include <vector>
 #include <cstring>
@@ -5,6 +6,7 @@
 #define re register
 #define ll long long
 using namespace std;
+
 template <typename T>
 inline void read(T &x)
 {
@@ -26,21 +28,21 @@ inline void read(T &x)
 		x=~x+1;
 	return;
 }
-const int N=250000+5;
+const int N=1000000+5;
 struct Edge
 {
-	int next,to,dis;
+	int next,to;
+	Edge() {}
+	Edge(int nownext,int nowto):next(nownext),to(nowto) {}
 } edge[N<<1];
 int head[N],num_edge;
-inline void add_edge(int from,int to,int dis)
+inline void add_edge(int from,int to)
 {
-	edge[++num_edge].next=head[from];
-	edge[num_edge].to=to;
-	edge[num_edge].dis=dis;
+	edge[++num_edge]=Edge(head[from],to);
 	head[from]=num_edge;
 }
-int dfn[N],top[N],fa[N],size[N],son[N],dfstime,dep[N];
-ll mindis[N];
+int dfstime;
+int dfn[N],dep[N],size[N],fa[N],top[N],son[N];
 inline void dfs1(int u,int fa_)
 {
 	fa[u]=fa_;
@@ -50,7 +52,7 @@ inline void dfs1(int u,int fa_)
 		int &v=edge[i].to;
 		if(v==fa_)
 			continue;
-		mindis[v]=min(mindis[u],(ll)edge[i].dis);
+//		mindis[v]=min(mindis[u],(ll)edge[i].dis);
 		dep[v]=dep[u]+1;
 		dfs1(v,u);
 		size[u]+=size[v];
@@ -85,24 +87,22 @@ inline int LCA(int x,int y)
 		swap(x,y);
 	return x;
 }
-
+int st[N],tp;
 vector<int>aux[N];
 inline void add(int x,int y)
 {
 	aux[x].push_back(y);
 	return;
 }
-int st[N],tp;
 inline void insert(int u)
 {
-	if(tp==1)
+	if(tp<=1)
 	{
 		st[++tp]=u;
 		return;
 	}
 	int lca=LCA(st[tp],u);
-	if(lca==st[tp])
-		return;
+//	printf("%d %d %d\n",lca,st[tp],u);
 	while(tp>1&&dfn[lca]<=dfn[st[tp-1]])
 	{
 		add(st[tp-1],st[tp]);
@@ -115,22 +115,39 @@ inline void insert(int u)
 	}
 	st[++tp]=u;
 }
-bool tag[N];
-inline ll dp(int u)
-{
-//	printf(" %d:",u);
-	if(aux[u].size()==0)
-		return mindis[u];
-	ll tmp=0ll;
-	for(re int i=0; i<aux[u].size(); ++i)
-		tmp+=dp(aux[u][i]);
-	aux[u].clear();
-	return min(tmp,mindis[u]);
-}
+#define dist(x,y) (abs(dep[y]-dep[x]))
+int tag[N];
 int n,m,q,a[N];
 inline bool cmp(const int &rhsx,const int &rhsy)
 {
 	return dfn[rhsx]<dfn[rhsy];
+}
+ll ans;
+int ansmin,ansmax;
+int maxx[N],minn[N];
+ll sum[N];
+inline void dp(int u)
+{
+	minn[u]=tag[u]?0:0x3f3f3f3f;
+	sum[u]=0ll;
+	maxx[u]=0;
+	for(re int i=0; i<aux[u].size(); ++i)
+	{
+		int &v=aux[u][i];
+		int w=dist(u,v);
+		dp(v);
+		if(tag[u])
+		{
+			ans+=w*tag[v]*tag[u]+sum[u]*tag[v]+sum[v]*tag[u];
+			ansmin=min(ansmin,minn[u]+w+minn[v]);
+			ansmax=max(ansmax,maxx[u]+w+maxx[v]);
+		}
+		minn[u]=min(minn[u],w+minn[v]);
+		maxx[u]=max(maxx[u],w+maxx[v]);
+		tag[u]+=tag[v];
+		sum[u]+=sum[v]+w*tag[v];
+	}
+	aux[u].clear();
 }
 inline void work()
 {
@@ -138,13 +155,16 @@ inline void work()
 	for(re int i=1; i<=m; ++i)
 	{
 		read(a[i]);
-		tag[a[i]]=true;
+		tag[a[i]]=1;
 	}
 	sort(a+1,a+1+m,cmp);
-	st[tp=1]=1;
+//	for(re int i=1; i<=m; ++i)
+//		printf("%d ",a[i]);
+	if(a[1]!=1)
+		st[tp=1]=1;
 	for(re int i=1; i<=m; ++i)
 		insert(a[i]);
-	while(tp>1)
+	while(tp>0)
 	{
 		add(st[tp-1],st[tp]);
 		--tp;
@@ -153,29 +173,32 @@ inline void work()
 //	{
 //		printf("\n%d:",i);
 //		for(re int j=0; j<aux[i].size(); ++j)
-//			printf(" %d ",aux[i][j]);
+//			printf(" %d",aux[i][j]);
 //	}
-
-	printf("%lld\n",dp(1));
 //	putchar('\n');
+	ansmin=0x3f3f3f3f;
+	ans=0ll;
+	ansmax=0;
+	dp(1);
+	printf("%lld %d %d\n",ans,ansmin,ansmax);
+	memset(tag,0,sizeof(int)*n);
 }
-const ll INF=1e18;
 int main()
 {
 	read(n);
 	for(re int i=1; i<n; ++i)
 	{
-		int u,v,w;
-		read(u),read(v),read(w);
-		add_edge(u,v,w);
-		add_edge(v,u,w);
+		int u,v;
+		read(u),read(v);
+		add_edge(u,v);
+		add_edge(v,u);
 	}
-	mindis[1]=INF;
 	dfs1(1,0);
 	dfs2(1,1);
 //	for(re int i=1; i<=n; ++i)
-//		printf("%d %d %d %lld %d\n",dfn[i],top[i],size[i],mindis[i],son[i]);
+//		printf("%d %d %d %d\n",dfn[i],top[i],size[i],son[i]);
 	read(q);
 	while(q--)
 		work();
+	return 0;
 }
