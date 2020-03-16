@@ -103,7 +103,7 @@ int n,m;
 char str[10];
 int main()
 {
-	srand(123456);
+	srand(123456),srand(rand()),srand(rand());
 	read(n),read(m);
 	for(re int i=1; i<=n; ++i)
 	{
