@@ -1,52 +1,6 @@
-#pragma GCC optimize("Ofast")
-#pragma GCC optimize("inline")
-#pragma GCC optimize("-fgcse")
-#pragma GCC optimize("-fgcse-lm")
-#pragma GCC optimize("-fipa-sra")
-#pragma GCC optimize("-ftree-pre")
-#pragma GCC optimize("-ftree-vrp")
-#pragma GCC optimize("-fpeephole2")
-#pragma GCC optimize("-ffast-math")
-#pragma GCC optimize("-fsched-spec")
-#pragma GCC optimize("unroll-loops")
-#pragma GCC optimize("-falign-jumps")
-#pragma GCC optimize("-falign-loops")
-#pragma GCC optimize("-falign-labels")
-#pragma GCC optimize("-fdevirtualize")
-#pragma GCC optimize("-fcaller-saves")
-#pragma GCC optimize("-fcrossjumping")
-#pragma GCC optimize("-fthread-jumps")
-#pragma GCC optimize("-funroll-loops")
-#pragma GCC optimize("-fwhole-program")
-#pragma GCC optimize("-freorder-blocks")
-#pragma GCC optimize("-fschedule-insns")
-#pragma GCC optimize("inline-functions")
-#pragma GCC optimize("-ftree-tail-merge")
-#pragma GCC optimize("-fschedule-insns2")
-#pragma GCC optimize("-fstrict-aliasing")
-#pragma GCC optimize("-fstrict-overflow")
-#pragma GCC optimize("-falign-functions")
-#pragma GCC optimize("-fcse-skip-blocks")
-#pragma GCC optimize("-fcse-follow-jumps")
-#pragma GCC optimize("-fsched-interblock")
-#pragma GCC optimize("-fpartial-inlining")
-#pragma GCC optimize("no-stack-protector")
-#pragma GCC optimize("-freorder-functions")
-#pragma GCC optimize("-findirect-inlining")
-#pragma GCC optimize("-fhoist-adjacent-loads")
-#pragma GCC optimize("-frerun-cse-after-loop")
-#pragma GCC optimize("inline-small-functions")
-#pragma GCC optimize("-finline-small-functions")
-#pragma GCC optimize("-ftree-switch-conversion")
-#pragma GCC optimize("-foptimize-sibling-calls")
-#pragma GCC optimize("-fexpensive-optimizations")
-#pragma GCC optimize("-funsafe-loop-optimizations")
-#pragma GCC optimize("inline-functions-called-once")
-#pragma GCC optimize("-fdelete-null-pointer-checks")
 #include <cstdio>
 #include <algorithm>
-#define min(x,y) ((x)<(y)?(x):(y))
-#define max(x,y) ((x)>(y)?(x):(y))
+#define swap(x,y) (x^=y^=x)
 #define re register
 using namespace std;
 
@@ -168,9 +122,10 @@ inline void rebuild(int rt)
 			recycle[++top]=rc(recycle[i]);
 	}
 }
+const double alpha=0.7204;
 inline void check(int &rt,bool flag)
 {
-	if((tree[rt].size*3>>2)<max(tree[lc(rt)].size,tree[rc(rt)].size))
+	if((tree[rt].size*alpha)<max(tree[lc(rt)].size,tree[rc(rt)].size))
 	{
 		rebuild(rt);
 		build(rt,1,top,flag);
@@ -209,23 +164,6 @@ struct node
 } a[N];
 int n,k;
 int mp[N];
-inline void solve(int l,int r)
-{
-//	printf("%d %d\n",l,r);
-	for(re int i=l; i<=r; ++i)
-	{
-		need.x=a[i].y,need.y=a[i].z;
-		insert(root,true);
-	}
-	for(re int i=l; i<=r; ++i)
-	{
-		need.x=a[i].y,need.y=a[i].z;
-		++mp[query(root)];
-	}
-//	for(re int i=1; i<=cnt; ++i)
-//		printf("%d %d %d %d %d %d\n",tree[i].maxx,tree[i].minx,tree[i].maxy,tree[i].miny,tree[i].point.x,tree[i].point.y);
-//	putchar('\n');
-}
 using namespace IO;
 int main()
 {
@@ -238,19 +176,37 @@ int main()
 		read(a[i].y);
 		read(a[i].z);
 	}
-	stable_sort(a+1,a+1+n);
+	sort(a+1,a+1+n);
 //	for(re int i=1; i<=n; ++i)
 //		printf("%d %d %d\n",a[i].x,a[i].y,a[i].z);
-	re int head=1,tail=2;
+	re int head=1,tail=2,pos;
 	for(; tail<=n; ++tail)
 	{
 		if(a[head].x!=a[tail].x)
 		{
-			solve(head,tail-1);
+			for(pos=head; pos<tail; ++pos)
+			{
+				need.x=a[pos].y,need.y=a[pos].z;
+				insert(root,true);
+			}
+			for(pos=head; pos<tail; ++pos)
+			{
+				need.x=a[pos].y,need.y=a[pos].z;
+				++mp[query(root)];
+			}
 			head=tail;
 		}
 	}
-	solve(head,tail-1);
+	for(pos=head; pos<tail; ++pos)
+	{
+		need.x=a[pos].y,need.y=a[pos].z;
+		insert(root,true);
+	}
+	for(pos=head; pos<tail; ++pos)
+	{
+		need.x=a[pos].y,need.y=a[pos].z;
+		++mp[query(root)];
+	}
 	for(re int i=1; i<=n; ++i)
 		write(mp[i]);
 	flush();

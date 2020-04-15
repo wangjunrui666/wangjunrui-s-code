@@ -55,10 +55,9 @@ inline void dfs1(int u,int _fa)
 			son[u]=v;
 	}
 }
-int dfn[N],dfstime,top[N];
+int top[N];
 inline void dfs2(int u,int topf)
 {
-	dfn[u]=++dfstime;
 	top[u]=topf;
 	if(!son[u])
 		return;
@@ -84,21 +83,12 @@ inline int LCA(int x,int y)
 	return x;
 }
 int n,m;
-struct node
-{
-	int u,d,val;
-	node(int _u=0,int _d=0,int _val=0):u(_u),d(_d),val(_val) {}
-	inline bool operator > (const node&rhs)const
-	{
-		return dfn[u]>dfn[rhs.u];
-	}
-} q[N<<2];
 int tot;
 struct Tree
 {
 	int l,r;
 	int size,val;
-} tree[N*50];
+} tree[N*40];
 #define lc(x) tree[x].l
 #define rc(x) tree[x].r
 int root[N],treesize;
@@ -115,7 +105,7 @@ inline void pushup(int rt)
 		tree[rt].val=tree[rc(rt)].val;
 	}
 }
-inline int merge(int x,int y,int l,int r)
+inline int merge(int x,int y,int l=1,int r=1e5)
 {
 	if(!x||!y)
 		return x|y;
@@ -148,26 +138,41 @@ inline void update(int &rt,int l,int r,int pos,int val)
 		update(rc(rt),mid+1,r,pos,val);
 	pushup(rt);
 }
-int ans[N];
+int dfn[N],dfstime,ans[N];
+struct node
+{
+	int u,d,val;
+	node(int _u=0,int _d=0,int _val=0):u(_u),d(_d),val(_val) {}
+	inline bool operator > (const node&rhs)const
+	{
+		return dfn[u]>dfn[rhs.u];
+	}
+} q[N<<2];
+inline void dfs3(int u)
+{
+	for(re int i=head[u]; i; i=edge[i].next)
+	{
+		int &v=edge[i].to;
+		if(v==fa[u])
+			continue;
+		dfs3(v);
+	}
+	dfn[u]=++dfstime;
+}
 inline void dfs(int u,int _fa)
 {
+	for(re int i=head[u]; i; i=edge[i].next)
+	{
+		int &v=edge[i].to;
+		if(v==_fa)
+			continue;
+		dfs(v,u);
+		root[u]=merge(root[u],root[v]);
+	}
 	while(q[tot].u==u)
 	{
 		update(root[u],1,100000,q[tot].d,q[tot].val);
 		--tot;
-	}
-	if(son[u])
-	{
-		dfs(son[u],u);
-		root[u]=merge(root[u],root[son[u]],1,100000);
-	}
-	for(re int i=head[u]; i; i=edge[i].next)
-	{
-		int &v=edge[i].to;
-		if(v==_fa||v==son[u])
-			continue;
-		dfs(v,u);
-		root[u]=merge(root[u],root[v],1,100000);
 	}
 	ans[u]=tree[root[u]].size?tree[root[u]].val:0;
 }
@@ -183,6 +188,7 @@ int main()
 	}
 	dfs1(1,0);
 	dfs2(1,1);
+	dfs3(1);
 	for(re int i=1; i<=m; ++i)
 	{
 		int x,y,d;
