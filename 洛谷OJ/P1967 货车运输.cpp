@@ -1,153 +1,149 @@
-#include<cstdio>
-#include<algorithm>
+#include <cmath>
+#include <cstdio>
+#include <bitset>
+#include <cstring>
+#include <algorithm>
+#define lowbit(x) (x&(-x))
 #define re register
-#define co const
+#define ll long long
+#define ull unsigned long long
+#define rep(i,a,b) for(re int i=a;i<=b;++i)
+#define per(i,a,b) for(re int i=a;i>=b;--i)
 using namespace std;
 template<typename T>
 inline void read(T&x)
 {
 	x=0;
-	char s=getchar();
+	char s=(char)getchar();
 	bool f=false;
 	while(!(s>='0'&&s<='9'))
 	{
 		if(s=='-')
 			f=true;
-		s=getchar();
+		s=(char)getchar();
 	}
 	while(s>='0'&&s<='9')
 	{
 		x=(x<<1)+(x<<3)+s-'0';
-		s=getchar();
+		s=(char)getchar();
 	}
 	if(f)
 		x=(~x)+1;
-	return;
 }
-co int Size=25,N=1e4+10,M=1e5+10;
-int f[N][Size],val[N][Size];
+template<typename T,typename ...T1>
+inline void read(T&x,T1&...x1)
+{
+	read(x);
+	read(x1...);
+}
+const int N=1e4+5,M=5e4+5,INF=0x3f3f3f3f;
+int father[N];
+inline int find(int x)
+{
+	return !father[x]?x:father[x]=find(father[x]);
+}
 struct Edge
 {
 	int next,to,dis;
+	Edge(int _next=0,int _to=0,int _dis=0):next(_next),to(_to),dis(_dis) {}
 } edge[M<<1];
+int head[N],num_edge;
+inline void add_edge(int from,int to,int dis)
+{
+	edge[++num_edge]=Edge(head[from],to,dis);
+	head[from]=num_edge;
+}
+inline void unionn(int x,int y,int dis)
+{
+	int fx=find(x),fy=find(y);
+	if(fx==fy)
+		return;
+	father[fx]=fy;
+	add_edge(x,y,dis);
+	add_edge(y,x,dis);
+}
 struct node
 {
 	int u,v,w;
-	inline bool operator <(const node &a)const
+	inline bool operator <(const node &rhs)const
 	{
-		return w>a.w;
+		return w>rhs.w;
 	}
 } e[M];
-int n,m,dep[N],head[N],num_edge,father[N],q;
-inline void add_edge(co int & from,co int & to,co int & dis)
+int fa[N][20],minn[N][20],dep[N],Log[N];
+inline void dfs(int u)
 {
-	edge[++num_edge].next=head[from];
-	edge[num_edge].to=to;
-	edge[num_edge].dis=dis;
-	head[from]=num_edge;
-}
-inline void Deal_first(int u,int father)
-{
-	dep[u]=dep[father]+1;
-	for(re int i=0; i<=19; i++)
+	for(re int i=0; i<Log[dep[u]]; ++i)
 	{
-		f[u][i+1]=f[f[u][i]][i];
-		val[u][i+1]=min(val[u][i],val[f[u][i]][i]);
+		fa[u][i+1]=fa[fa[u][i]][i];
+		minn[u][i+1]=min(minn[u][i],minn[fa[u][i]][i]);
 	}
 	for(re int i=head[u]; i; i=edge[i].next)
 	{
 		int &v=edge[i].to;
-		if((v)!=father)
-		{
-			f[v][0]=u;
-			val[v][0]=edge[i].dis;
-			Deal_first(v,u);
-		}
+		if(v==fa[u][0])
+			continue;
+		dep[v]=dep[u]+1;
+		fa[v][0]=u;
+		minn[v][0]=edge[i].dis;
+		dfs(v);
 	}
-	return;
 }
-inline int LCA(int x,int y)
+inline int query(int x,int y)
 {
+	int ans=INF;
 	if(dep[x]<dep[y])
 		swap(x,y);
-	int minx=0x7fffffff;
-	for(re int i=20; i>=0; i--)
-	{
-		if(dep[f[x][i]]>=dep[y])
+	for(re int i=Log[dep[x]]; i>=0; --i)
+		if(dep[fa[x][i]]>=dep[y])
 		{
-			minx=min(minx,val[x][i]);
-			x=f[x][i];
+			ans=min(ans,minn[x][i]);
+			x=fa[x][i];
+			if(x==y)
+				return ans;
 		}
-		if(x==y)
-			return minx;
-	}
-	for(re int i=20; i>=0; i--)
-	{
-		if(f[x][i]!=f[y][i])
+//	printf("%d\n",ans);
+	for(re int i=Log[dep[x]]; i>=0; --i)
+		if(fa[x][i]!=fa[y][i])
 		{
-			minx=min(minx,min(val[x][i],val[y][i]));
-			x=f[x][i];
-			y=f[y][i];
+			ans=min(ans,min(minn[x][i],minn[y][i]));
+			x=fa[x][i],y=fa[y][i];
 		}
-	}
-	return min(minx,min(val[x][0],val[y][0]));
+	return min(ans,min(minn[x][0],minn[y][0]));
 }
-inline int find(int x)
+signed main()
 {
-	return father[x]==x?x:father[x]=find(father[x]);
-}
-int main()
-{
-	read(n);
-	read(m);
-	for(re int i=1; i<=m; i++)
-	{
-		read(e[i].u);
-		read(e[i].v);
-		read(e[i].w);
-	}
-	stable_sort(e+1,e+1+m);
-	//putchar('\n');
-	for(re int i=1; i<=n; i++)
-		father[i]=i;
-	for(re int i=1,fx,fy; i<=m; i++)
-	{
-		fx=find(e[i].u);
-		fy=find(e[i].v);
-		if(fx!=fy)
+	int n,m;
+	read(n,m);
+	Log[0]=-1;
+	for(re int i=1; i<=n; ++i)
+		Log[i]=Log[i>>1]+1;
+	for(re int i=1; i<=m; ++i)
+		read(e[i].u,e[i].v,e[i].w);
+	sort(e+1,e+1+m);
+	for(re int i=1; i<=m; ++i)
+		unionn(e[i].u,e[i].v,e[i].w);
+	for(re int i=1; i<=n; ++i)
+		if(!dep[i])
 		{
-			father[fx]=fy;
-			add_edge(e[i].u,e[i].v,e[i].w);
-			add_edge(e[i].v,e[i].u,e[i].w);
-			//printf("%d %d %d\n",e[i].u,e[i].v,e[i].w);
+			dep[i]=1;
+			dfs(i);
 		}
-	}
-	Deal_first(1,0);
-	/*for(re int i=1; i<=n; i++)
-		printf("%d ",dep[i]);*/
-	/*for(re int i=1; i<=n; i++)
-	{
-		for(re int j=0; j<=19; j++)
-			printf("%d ",val[i][j]);
-		putchar('\n');
-	}*/
+//	for(re int i=1; i<=n; ++i)
+//	{
+//		for(re int j=0; j<=Log[dep[i]]; ++j)
+//			printf(" %d",minn[i][j]);
+//		putchar('\n');
+//	}
+	int q;
 	read(q);
-	re int s,t;
 	while(q--)
 	{
-		read(s);
-		read(t);
-		if(find(s)!=find(t))
-		{
-			printf("-1\n");
-			continue;
-		}
-		int x=LCA(s,t);
-		if(s==6&&t==7)
-			printf("%d\n",4);
-		else
-			printf("%d\n",x);
+		int x,y;
+		read(x,y);
+		printf("%d\n",find(x)==find(y)?query(x,y):-1);
 	}
 	return 0;
 }
+
 

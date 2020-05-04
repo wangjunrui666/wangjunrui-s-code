@@ -60,7 +60,7 @@ inline int getmax(int x,int y)
 inline void pushup(int x)
 {
 	tree[x].size=tree[lc(x)].size+tree[rc(x)].size+1;
-	tree[x].mx=getmax(x,getmax(tree[lc(x)].mx,tree[rc(x)].mx));
+	tree[x].mx=getmax(tree[x].id,getmax(tree[lc(x)].mx,tree[rc(x)].mx));
 }
 inline void pushdown(int x)
 {
