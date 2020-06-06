@@ -11,35 +11,36 @@ inline bool cmp(int *r,int a,int b,int l)
 }
 inline void da(int *r,int *sa,int n,int m)
 {
-	int *x=wa,*y=wb;
-	re int i,j,p;
-	for(i=0; i<m; ++i)
+	int p,*x=wa,*y=wb;
+	for(re int i=0; i<m; ++i)
 		ws[i]=0;
-	for(i=0; i<n; ++i)
+	for(re int i=0; i<n; ++i)
 		++ws[x[i]=r[i]];
-	for(i=1; i<m; ++i)
+	for(re int i=1; i<m; ++i)
 		ws[i]+=ws[i-1];
-	for(i=n-1; i>=0; --i)
+	for(re int i=n-1; i>=0; --i)
 		sa[--ws[x[i]]]=i;
-	for(j=1,p=1; p<n; j<<=1,m=p)
+	for(re int j=1; j<=n; j<<=1)
 	{
-		for(p=0,i=n-j; i<n; ++i)
+		p=0;
+		for(re int i=n-j; i<n; ++i)
 			y[p++]=i;
-		for(i=0; i<n; ++i)
+		for(re int i=0; i<n; ++i)
 			if(sa[i]>=j)
 				y[p++]=sa[i]-j;
-		for(i=0; i<n; ++i)
-			wv[i]=x[y[i]];
-		for(i=0; i<m; ++i)
+		for(re int i=0; i<m; ++i)
 			ws[i]=0;
-		for(i=0; i<n; ++i)
-			++ws[wv[i]];
-		for(i=1; i<m; ++i)
+		for(re int i=0; i<n; ++i)
+			++ws[x[y[i]]];
+		for(re int i=1; i<m; ++i)
 			ws[i]+=ws[i-1];
-		for(i=n-1; i>=0; --i)
-			sa[--ws[wv[i]]]=y[i];
-		for(swap(x,y),p=1,x[sa[0]]=0,i=1; i<n; ++i)
-			x[sa[i]]=cmp(y,sa[i-1],sa[i],j)?p-1:p++;
+		for(re int i=n-1; i>=0; --i)
+			sa[--ws[x[y[i]]]]=y[i];
+		swap(x,y),m=1,x[sa[0]]=0;
+		for(re int i=1; i<n; ++i)
+			x[sa[i]]=cmp(y,sa[i-1],sa[i],j)?m-1:m++;
+		if(m>=n)
+			break;
 	}
 }
 char str[N];

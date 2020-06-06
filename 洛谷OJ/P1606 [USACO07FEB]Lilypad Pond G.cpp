@@ -1,13 +1,4 @@
-#include <set>
-#include <map>
-#include <cmath>
-#include <queue>
-#include <vector>
-#include <cstdio>
-#include <bitset>
-#include <cstring>
-#include <iostream>
-#include <algorithm>
+#include <bits/stdc++.h>
 #define lowbit(x) (x&(-x))
 #define re register
 #define ll long long
@@ -46,8 +37,8 @@ int mp[N][N];
 #define pr pair<int,int>
 int dx[8]= {1,1,2,2,-1,-1,-2,-2};
 int dy[8]= {2,-2,1,-1,2,-2,1,-1};
-int dis[N][N];
-ull cnt[N][N],add[N][N];
+int dis[N][N],len[N][N];
+ull cnt[N][N];
 pr pre[N][N];
 pr bg,ed;
 bool exist[N][N];
@@ -87,13 +78,14 @@ signed main()
 		exist[x][y]=false;
 		for(re int i=0; i<8; ++i)
 		{
-			int fx=x+dx[i],fy=y+dy[i];
+			int fx=x+dx[i],fy=y+dy[i],val=(mp[fx][fy]==0)+1;
 			if(fx<1||fx>n||fy<1||fy>m||mp[fx][fy]==2)
 				continue;
-			if(dis[fx][fy]>dis[x][y]+(mp[fx][fy]==0))
+			if(dis[fx][fy]>dis[x][y]+val)
 			{
-				dis[fx][fy]=dis[x][y]+(mp[fx][fy]==0);
-				add[fx][fy]=cnt[fx][fy]=add[x][y];
+				dis[fx][fy]=dis[x][y]+val;
+				len[fx][fy]=len[x][y]+1;
+				cnt[fx][fy]=cnt[x][y];
 				pre[fx][fy]=make_pair(x,y);
 				if(!exist[fx][fy])
 				{
@@ -101,22 +93,12 @@ signed main()
 					q.push(make_pair(fx,fy));
 				}
 			}
-			else if(dis[fx][fy]==dis[x][y]+(mp[fx][fy]==0))
-			{
-				cnt[fx][fy]+=add[x][y];
-				if(!exist[fx][fy])
-				{
-					add[fx][fy]=add[x][y];
-					q.push(make_pair(fx,fy));
-				}
-				else
-					add[fx][fy]+=add[x][y];
-			}
+			else if(dis[fx][fy]==dis[x][y]+val)
+				cnt[fx][fy]+=cnt[x][y];
 		}
 	}
 //	dfs(ed);
-	printf("%d\n%llu\n",dis[ed.first][ed.second],cnt[ed.first][ed.second]);
+	printf("%d\n%llu\n",dis[ed.first][ed.second]-len[ed.first][ed.second],cnt[ed.first][ed.second]);
 	return 0;
 }
-
 
