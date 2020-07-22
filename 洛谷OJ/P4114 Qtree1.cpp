@@ -1,7 +1,10 @@
-#include <cstdio>
-#include <algorithm>
+#include <bits/stdc++.h>
+#define lowbit(x) ((x)&(-(x)))
 #define re register
-using namespace std;
+#define ll long long
+#define ull unsigned long long
+#define rep(i,a,b) for(re int i=a;i<=b;++i)
+#define per(i,a,b) for(re int i=a;i>=b;--i)
 template<typename T>
 inline void read(T&x)
 {
@@ -22,19 +25,29 @@ inline void read(T&x)
 	if(f)
 		x=(~x)+1;
 }
-const int N=1e5+5;
+template<typename T,typename ...T1>
+inline void read(T&x,T1&...x1)
+{
+	read(x);
+	read(x1...);
+}
+template<typename T>
+inline void clear(T*a,int l,int r,int val)
+{
+	memset(&a[l],val,sizeof(T)*(r-l+1));
+}
+using std::max;
+const int N=2e5+5;
 struct Tree
 {
 	int ch[2];
 	int fa;
-	int sum,val;
+	int max,val;
 	bool reverse;
 } tree[N];
 #define lc(x) tree[x].ch[0]
 #define rc(x) tree[x].ch[1]
 #define fa(x) tree[x].fa
-#define sum(x) tree[x].sum
-#define val(x) tree[x].val
 #define rev(x) tree[x].reverse
 inline bool check(int x)
 {
@@ -46,18 +59,19 @@ inline bool nroot(int x)
 }
 inline void pushup(int x)
 {
-	tree[x].sum=tree[lc(x)].sum^tree[rc(x)].sum^tree[x].val;
+	tree[x].max=max(max(tree[lc(x)].max,tree[rc(x)].max),tree[x].val);
 }
 inline void pushdown(int x)
 {
-	if(!rev(x))
-		return;
-	swap(lc(x),rc(x));
-	if(lc(x))
-		rev(lc(x))^=1;
-	if(rc(x))
-		rev(rc(x))^=1;
-	rev(x)=false;
+	if(rev(x))
+	{
+		std::swap(lc(x),rc(x));
+		if(lc(x))
+			rev(lc(x))^=1;
+		if(rc(x))
+			rev(rc(x))^=1;
+		rev(x)=false;
+	}
 }
 inline void rotate(int x)
 {
@@ -84,7 +98,7 @@ inline void splay(int x)
 	while(nroot(x))
 	{
 		if(nroot(fa(x)))
-			rotate(check(x)==check(fa(x))?fa(x):x);
+			rotate(check(fa(x))==check(x)?fa(x):x);
 		rotate(x);
 	}
 }
@@ -120,43 +134,44 @@ inline void split(int x,int y)
 }
 inline void link(int x,int y)
 {
-	if(findroot(x)==findroot(y))
-		return;
 	makeroot(x);
 	fa(x)=y;
 }
-inline void cut(int x,int y)
-{
-	split(x,y);
-	if(findroot(y)!=x||fa(y)!=x||lc(x))
-		return;
-	rc(x)=fa(y)=0;
-}
 signed main()
 {
-	int n,m;
-	read(n),read(m);
-	for(re int i=1; i<=n; ++i)
-		read(tree[i].val);
-	while(m--)
+	int n;
+	read(n);
+	for(re int i=1; i<n; ++i)
 	{
-		int opt,x,y;
-		read(opt),read(x),read(y);
-		if(opt==0)
+		int u,v,w;
+		read(u,v,w);
+		tree[i+n].val=w;
+		link(u,i+n);
+		link(i+n,v);
+	}
+	while(1)
+	{
+		char opt[10];
+		scanf("%s",opt);
+		if(opt[0]=='D')
+			return 0;
+		if(opt[0]=='Q')
 		{
-			split(x,y);
-			printf("%d\n",tree[y].sum);
+			int u,v;
+			read(u,v);
+			split(u,v);
+			printf("%d\n",tree[v].max);
 		}
-		else if(opt==1)
-			link(x,y);
-		else if(opt==2)
-			cut(x,y);
-		else if(opt==3)
+		else if(opt[0]=='C')
 		{
-			splay(x);
-			tree[x].val=y;
-			pushup(x);
+			int x,w;
+			read(x,w);
+			makeroot(x+n);
+			tree[x+n].val=w;
+			pushup(x+n);
 		}
 	}
 	return 0;
 }
+
+
