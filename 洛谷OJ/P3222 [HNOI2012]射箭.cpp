@@ -52,7 +52,7 @@ struct Point
 	{
 		return Point(x-rhs.x,y-rhs.y);
 	}
-	inline double operator ^(const Point &rhs)const//¦Ì??y
+	inline double operator ^(const Point &rhs)const//ï¿½ï¿½??y
 	{
 		return x*rhs.x+y*rhs.y;
 	}
@@ -106,9 +106,6 @@ inline bool check(int val)
 	for(int i=1; i<=n; ++i)
 		if(line[i].id<=val&&a[cnt].theta!=line[i].theta)
 			a[++cnt]=line[i];
-//	printf("\n%d:\n",val);
-//	for(int i=1; i<=cnt; ++i)
-//		printf("%lf %lf %lf %lf %lf %d\n",a[i].x.x,a[i].x.y,a[i].y.x,a[i].y.y,a[i].theta,a[i].id);
 	int head=1,tail=0;
 	for(int i=1; i<=cnt; ++i)
 	{
@@ -117,21 +114,12 @@ inline bool check(int val)
 		while(head<tail&&check(q[head],q[head+1],a[i]))
 			++head;
 		q[++tail]=a[i];
-//		printf("%d %d\n",head,tail);
-//		for(int j=head; j<=tail; ++j)
-//			printf("%lf %lf %lf %lf %lf %d\n",q[j].x.x,q[j].x.y,q[j].y.x,q[j].y.y,q[j].theta,q[j].id);
+			printf("%lf %lf %lf %lf %lf %d\n",q[j].x.x,q[j].x.y,q[j].y.x,q[j].y.y,q[j].theta,q[j].id);
 	}
-//	putchar('-');
 	while(head<tail&&check(q[tail-1],q[tail],q[head]))
 		--tail;
-//	printf("%d %d\n",head,tail);
-//	for(int j=head; j<=tail; ++j)
-//		printf("%lf %lf %lf %lf %lf %d\n",q[j].x.x,q[j].x.y,q[j].y.x,q[j].y.y,q[j].theta,q[j].id);
 	while(head<tail&&check(q[head],q[head+1],q[tail]))
 		++head;
-//	printf("%d %d\n",head,tail);
-//	for(int j=head; j<=tail; ++j)
-//		printf("%lf %lf %lf %lf %lf %d\n",q[j].x.x,q[j].x.y,q[j].y.x,q[j].y.y,q[j].theta,q[j].id);
 	return tail-head>1;
 }
 signed main()
@@ -154,8 +142,6 @@ signed main()
 	for(int i=1; i<=n; ++i)
 		line[i].theta=atan2(line[i].calc().y,line[i].calc().x);
 	sort(line+1,line+1+n);
-//	for(int i=1; i<=n; ++i)
-//		printf("%lf %lf %lf %lf %lf\n",line[i].x.x,line[i].x.y,line[i].y.x,line[i].y.y,line[i].theta);
 	while(l<=r)
 	{
 		mid=(l+r)>>1;
