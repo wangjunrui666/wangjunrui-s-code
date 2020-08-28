@@ -37,31 +37,32 @@ inline void clear(T*array,int l,int r,int val)
 	memset(&array[l],val,sizeof(T)*(r-l+1));
 }
 using namespace std;
-const int N=1e5+5;
+const int N=10005;
 struct Tree
 {
-	int sum,cnt;
-} tree[N*8];
+	int suf,pre,sum,cnt,ans;
+} tree[N*4];
 #define lc (rt<<1)
 #define rc (rt<<1|1)
-struct node
-{
-	int x,y,h,v;
-	node(int _x=0,int _y=0,int _h=0,int _v=0):x(_x),y(_y),h(_h),v(_v) {}
-	inline bool operator <(const node&rhs)const
-	{
-		return h<rhs.h;
-	}
-} a[N*2];
-int n,p[N*2];
+int p[N];
 inline void pushup(int l,int r,int rt)
 {
 	if(tree[rt].cnt)
+	{
+		tree[rt].suf=tree[rt].pre=tree[rt].ans=1;
 		tree[rt].sum=p[r+1]-p[l];
+	}
 	else if(l==r)
-		tree[rt].sum=0;
+		tree[rt].suf=tree[rt].pre=tree[rt].ans=tree[rt].sum=0;
 	else
+	{
+		tree[rt].pre=tree[lc].pre;
+		tree[rt].suf=tree[rc].suf;
+		tree[rt].ans=tree[lc].ans+tree[rc].ans;
+		if(tree[lc].suf&&tree[rc].pre)
+			--tree[rt].ans;
 		tree[rt].sum=tree[lc].sum+tree[rc].sum;
+	}
 }
 inline void update(int rt,int l,int r,int x,int y,int val)
 {
@@ -78,7 +79,16 @@ inline void update(int rt,int l,int r,int x,int y,int val)
 	update(rc,mid+1,r,x,y,val);
 	pushup(l,r,rt);
 }
-int cnt=0;
+int n;
+struct node
+{
+	int x,y,h,v;
+	node(int _x=0,int _y=0,int _h=0,int _v=0):x(_x),y(_y),h(_h),v(_v) {}
+	inline bool operator <(const node &rhs)const
+	{
+		return h<rhs.h;
+	}
+} a[N];
 signed main()
 {
 	read(n);
@@ -91,20 +101,22 @@ signed main()
 		p[i]=x1;
 		p[i+n]=x2;
 	}
-	n*=2;
+	n<<=1;
 	sort(a+1,a+1+n);
 	sort(p+1,p+1+n);
-	cnt=(int)(unique(p+1,p+1+n)-p-1);
+	int tot=(int)(unique(p+1,p+1+n)-1-p);
 	ll ans=0;
+	int las=0;
 	for(int i=1; i<n; ++i)
 	{
-		int l=(int)(lower_bound(p+1,p+1+cnt,a[i].x)-p);
-		int r=(int)(lower_bound(p+1,p+1+cnt,a[i].y)-p);
+		int l=(int)(lower_bound(p+1,p+1+tot,a[i].x)-p);
+		int r=(int)(lower_bound(p+1,p+1+tot,a[i].y)-p);
 		if(l<r)
-			update(1,1,cnt,l,r-1,a[i].v);
-		ans+=(ll)tree[1].sum*(a[i+1].h-a[i].h);
+			update(1,1,tot,l,r-1,a[i].v);
+		ans+=2*tree[1].ans*(a[i+1].h-a[i].h)+abs(tree[1].sum-las);
+		las=tree[1].sum;
 	}
-	cout<<ans<<endl;
+	cout<<ans+las<<endl;
 	return 0;
 }
 
