@@ -118,7 +118,7 @@ inline bool check(ll val)
 	{
 		if(q[i].dis<=val)
 			break;
-		cnt=i;
+		++cnt;
 		int &x=q[i].x,&y=q[i].y,&lca=q[i].lca;
 		++diff[dfn[x]],++diff[dfn[y]];
 		diff[dfn[lca]]-=2;
