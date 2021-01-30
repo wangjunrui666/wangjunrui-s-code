@@ -55,7 +55,7 @@ struct node
 			return;
 		if(pos==len)
 			return;
-		now+=s[pos];
+		now.push_back(s[pos]);
 		if((int)now.length()>maxlen)
 			return;
 		ss[++cnt]=now;
@@ -97,7 +97,7 @@ inline void add_edge(int from,int to)
 }
 int belong[M];
 int out[M];
-bitset<M>vis;
+bool vis[M];
 inline bool find(int u)
 {
 	for(int i=head[u]; i; i=edge[i].next)
@@ -105,7 +105,7 @@ inline bool find(int u)
 		int &v=edge[i].to;
 		if(vis[v])
 			continue;
-		vis.set(v);
+		vis[v]=true;
 		if(!belong[v]||find(belong[v]))
 		{
 			belong[v]=u;
@@ -137,7 +137,7 @@ inline bool check(int val)
 	memset(belong,0,sizeof(belong));
 	for(int i=1; i<=n; ++i)
 	{
-		vis.reset();
+		memset(vis,0,sizeof(vis));
 		if(!find(i))
 			return false;
 	}
@@ -165,7 +165,7 @@ inline void print(int val)
 	memset(belong,0,sizeof(belong));
 	for(int i=1; i<=n; ++i)
 	{
-		vis.reset();
+		memset(vis,0,sizeof(vis));
 		find(i);
 	}
 	for(int i=1; i<=n; ++i)
@@ -192,10 +192,10 @@ signed main()
 		else
 			l=mid+1;
 	}
+	ios::sync_with_stdio(false);
 	cout<<ans<<endl;
 	if(~ans)
 		print(ans);
 	return 0;
 }
-
 

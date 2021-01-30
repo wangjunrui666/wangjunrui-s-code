@@ -111,17 +111,17 @@ signed main()
 		add_edge(u,v);
 		add_edge(v,u);
 	}
-	double l=0,r=1e5,ans=0;
+	double l=0,r=1e5;
 //	printf("%d\n",solve(1,0));
 	while(r-l>=1e-6)
 	{
 		double mid=(l+r)/2;
 		if(check(mid))
-			l=ans=mid;
+			l=mid;
 		else
 			r=mid;
 	}
-	printf("%.1lf\n",ans);
+	printf("%.1lf\n",l);
 	return 0;
 }
 
