@@ -115,24 +115,25 @@ inline bool find(int u)
 	}
 	return false;
 }
+unordered_map<string,int>mp;
 inline bool check(int val)
 {
+	mp.clear();
 	maxlen=val;
 	int m=0;
 	for(int i=1; i<=n; ++i)
 	{
 		a[i].solve();
 		for(int j=1; j<=a[i].cnt; ++j)
-			p[++m]=a[i].ss[j];
+			if(!mp.count(a[i].ss[j]))
+				mp[a[i].ss[j]]=++m;
 	}
-	sort(p+1,p+1+m);
-	m=(int)(unique(p+1,p+1+m)-p-1);
 	memset(head,0,sizeof(head));
 	num_edge=0;
 	for(int i=1; i<=n; ++i)
 	{
 		for(int j=1; j<=a[i].cnt; ++j)
-			add_edge(i,(int)(lower_bound(p+1,p+1+m,a[i].ss[j])-p+n));
+			add_edge(i,mp[a[i].ss[j]]+n);
 	}
 	memset(belong,0,sizeof(belong));
 	for(int i=1; i<=n; ++i)
@@ -145,22 +146,25 @@ inline bool check(int val)
 }
 inline void print(int val)
 {
+	mp.clear();
 	maxlen=val;
 	int m=0;
 	for(int i=1; i<=n; ++i)
 	{
 		a[i].solve();
 		for(int j=1; j<=a[i].cnt; ++j)
-			p[++m]=a[i].ss[j];
+			if(!mp.count(a[i].ss[j]))
+			{
+				p[++m]=a[i].ss[j];
+				mp[a[i].ss[j]]=m;
+			}
 	}
-	sort(p+1,p+1+m);
-	m=(int)(unique(p+1,p+1+m)-p-1);
 	memset(head,0,sizeof(head));
 	num_edge=0;
 	for(int i=1; i<=n; ++i)
 	{
 		for(int j=1; j<=a[i].cnt; ++j)
-			add_edge(i,(int)(lower_bound(p+1,p+1+m,a[i].ss[j])-p+n));
+			add_edge(i,mp[a[i].ss[j]]+n);
 	}
 	memset(belong,0,sizeof(belong));
 	for(int i=1; i<=n; ++i)
