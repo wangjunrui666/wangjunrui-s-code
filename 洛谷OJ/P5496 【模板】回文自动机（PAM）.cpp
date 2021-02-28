@@ -37,72 +37,60 @@ inline void clear(T*array,int l,int r,int val)
 	memset(&array[l],val,sizeof(T)*(r-l+1));
 }
 using namespace std;
-const int N=3e5+5;
+const int N=5e5+5;
 struct PAM
 {
 	int fa,len;
-	int size;
+	int ans;
 	int ch[26];
 } point[N];
 int cnt=1,las=0;
-int len,n;
 char str[N];
+int n,len;
 inline int getfa(int x)
 {
+//	printf("%d\n",x);
 	while(str[n]!=str[n-point[x].len-1])
 		x=point[x].fa;
+//	printf("%d\n",x);
 	return x;
 }
-int f[N];
 inline void insert(int c)
 {
+//	printf("%d\n",n);
 	int cur=getfa(las);
 	int now=point[cur].ch[c];
+//	printf("%d\n",cur);
+//	printf("nmsl\n");
+//	printf("las=%d p=%d\n",las,cur);
+//	printf("c=%d\n",c);
 	if(!now)
 	{
 		now=++cnt;
 		point[now].len=point[cur].len+2;
 		point[now].fa=point[getfa(point[cur].fa)].ch[c];
+		point[now].ans=point[point[now].fa].ans+1;
 		point[cur].ch[c]=now;
 	}
-	++f[now];
 	las=now;
-}
-struct Edge
-{
-	int next,to;
-} edge[N];
-int head[N],num_edge;
-inline void add_edge(int from,int to)
-{
-	edge[++num_edge].next=head[from];
-	edge[num_edge].to=to;
-	head[from]=num_edge;
-}
-ll ans=0;
-inline void dfs(int u)
-{
-	for(int i=head[u]; i; i=edge[i].next)
-	{
-		int &v=edge[i].to;
-		dfs(v);
-		f[u]+=f[v];
-	}
-	ans=max(ans,(ll)f[u]*point[u].len);
+//	printf("fa=%d len=%d\n",point[now].fa,point[now].len);
 }
 signed main()
 {
 	point[1].len=-1;
-	point[1].fa=0;
 	point[0].fa=1;
+	point[1].fa=0;
 	scanf("%s",str+1);
 	len=(int)strlen(str+1);
+	int lastans=0;
 	for(n=1; n<=len; ++n)
+	{
+		str[n]=(str[n]-'a'+lastans)%26+'a';
 		insert(str[n]-'a');
-	for(int i=2; i<=cnt; ++i)
-		add_edge(point[i].fa,i);
-	dfs(0),dfs(1);
-	printf("%lld\n",ans);
+//		lastans=point[las].ans;
+		printf("%d ",lastans=point[las].ans);
+	}
+	putchar('\n');
 	return 0;
 }
 

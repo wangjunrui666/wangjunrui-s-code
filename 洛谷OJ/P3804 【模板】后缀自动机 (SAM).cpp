@@ -63,6 +63,9 @@ int main()
 		insert(s[i]-'a');
 	for(re int i=2; i<=tot; ++i)
 		add_edge(point[i].fa,i);
+	for(int i=1; i<=tot; ++i)
+		printf("%d ",point[i].len-point[point[i].fa].len);
+	putchar('\n');
 	dfs(1);
 	printf("%lld\n",ans);
 	return 0;
