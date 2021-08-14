@@ -38,11 +38,10 @@ inline void clear(T*array,int l,int r,int val)
 }
 using namespace std;
 const int N=2e5+5;
-int n,m;
 struct Tree
 {
 	int ch[2],fa;
-	int sum,fakesonsize;
+	int val,size,fakesonsize;
 	bool rev;
 } tree[N];
 #define lc(x) tree[x].ch[0]
@@ -58,7 +57,7 @@ inline bool check(int x)
 }
 inline void pushup(int x)
 {
-	tree[x].sum=tree[lc(x)].sum+tree[rc(x)].sum+tree[x].fakesonsize+1;
+	tree[x].size=tree[lc(x)].size+tree[rc(x)].size+tree[x].fakesonsize+tree[x].val;
 }
 inline void pushdown(int x)
 {
@@ -110,7 +109,7 @@ inline void access(int x)
 	for(int y=0; x; x=fa(y=x))
 	{
 		splay(x);
-		tree[x].fakesonsize+=tree[rc(x)].sum-tree[y].sum;
+		tree[x].fakesonsize+=tree[rc(x)].size-tree[y].size;
 		rc(x)=y;
 		pushup(x);
 	}
@@ -134,33 +133,39 @@ inline void link(int x,int y)
 {
 	makeroot(x),makeroot(y);
 	fa(x)=y;
-	tree[y].fakesonsize+=tree[x].sum;
+	tree[y].fakesonsize+=tree[x].size;
 	pushup(y);
 }
+int n,m;
+map<pair<int,int>,int>mp;
 signed main()
 {
-	freopen("dynamic_tree.in","r",stdin);
-	freopen("dynamic_tree.out","w",stdout);
 	read(n,m);
-	for(int i=1; i<=n; ++i)
+	for(int i=1;i<=n;++i)
+	{
+		tree[i].val=1;
 		pushup(i);
+	}
+	int cnt=n;
 	while(m--)
 	{
-		int opt,u;
-		read(opt,u);
-		if(opt==1)
-			makeroot(u);
-		else if(opt==2)
+		static char opt[10];
+		int u,v;
+		scanf("%s",opt);
+		read(u,v);
+		if(opt[0]=='A')
 		{
-			access(u);
-			printf("%d\n",tree[u].fakesonsize+1);
+			mp[make_pair(u,v)]=mp[make_pair(v,u)]=++cnt;
+			link(u,cnt),link(cnt,v);
 		}
-		else if(opt==3)
+		else if(opt[0]=='Q')
 		{
-			int v,rt=findroot(u);
-			read(v);
-			link(u,v);
+			int rt=mp[make_pair(u,v)];
 			makeroot(rt);
+			access(u);
+			int res=tree[u].fakesonsize+1;
+			access(v);
+			printf("%lld\n",(ll)res*(tree[v].fakesonsize+1));
 		}
 	}
 	return 0;
